@@ -1,8 +1,7 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+
 import { GraduationCap } from "lucide-react";
 import AuthServerButton from "@/auth/AuthServerButton";
-import { cookies } from "next/headers";
+
 
 export default function Home() {
 	return (
@@ -15,15 +14,9 @@ export default function Home() {
 				受験スケジュールを簡単に管理し、効率的な受験準備をサポートします。
 			</p>
 			<div className="flex gap-4">
-				{/* <Link href="/register">
-					<Button size="lg">新規登録</Button>
-				</Link> */}
-				{/* <Link href="/login">
-					<Button variant="outline" size="lg">
-						ログイン
-					</Button> */}
+
 					<AuthServerButton />
-				{/* </Link> */}
+
 			</div>
 		</div>
 	);
