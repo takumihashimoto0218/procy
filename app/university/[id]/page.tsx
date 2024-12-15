@@ -3,7 +3,7 @@ import { UniversityDetailCard } from "@/components/university/UniversityDetailCa
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { Database } from "@/types/supabase";
-import { Faculty, Department } from "@/types";
+
 
 export default async function UniversityDetailPage({
 	params,
