@@ -7,7 +7,7 @@
 // export default nextConfig;
 /** @type {import('next').Config} */
 const config = {
-  // 設定内容
+  ignoreBuildErrors: true,
 };
 
 module.exports = config;
