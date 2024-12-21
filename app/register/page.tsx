@@ -13,7 +13,6 @@ export default function RegisterPage() {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [error, setError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -42,9 +41,6 @@ export default function RegisterPage() {
 				if (profileError) throw profileError;
 				router.push("/dashboard");
 			}
-		} catch (error: any) {
-			console.error("Registration error:", error);
-			setError(error.message);
 		} finally {
 			setIsLoading(false);
 		}
@@ -90,7 +86,6 @@ export default function RegisterPage() {
 						required
 					/>
 				</div>
-				{error && <p className="text-red-500 text-sm">{error}</p>}
 				<Button type="submit" className="w-full" disabled={isLoading}>
 					{isLoading ? "登録中..." : "登録"}
 				</Button>

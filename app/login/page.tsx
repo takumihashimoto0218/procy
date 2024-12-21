@@ -11,7 +11,6 @@ export default function LoginPage() {
 	const router = useRouter();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [error, setError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -24,8 +23,6 @@ export default function LoginPage() {
 			});
 			if (error) throw error;
 			router.push("/dashboard");
-		} catch (error: any) {
-			setError(error.message);
 		} finally {
 			setIsLoading(false);
 		}
@@ -73,7 +70,6 @@ export default function LoginPage() {
 							/>
 						</div>
 					</div>
-					{error && <p className="text-red-500 text-sm text-center">{error}</p>}
 					<Button type="submit" className="w-full" disabled={isLoading}>
 						{isLoading ? "ログイン中..." : "ログイン"}
 					</Button>
@@ -88,71 +84,3 @@ export default function LoginPage() {
 		</div>
 	);
 }
-
-// "use client";
-
-// import { useState } from "react";
-// import { supabase } from "@/lib/supabase";
-
-// const Auth = () => {
-// 	const [email, setEmail] = useState("");
-// 	const [password, setPassword] = useState("");
-// 	const [isLoading, setIsLoading] = useState(false);
-
-// 	const handleLogin = async () => {
-// 		try {
-// 			setIsLoading(true);
-// 			const { error } = await supabase.auth.signInWithPassword({
-// 				email,
-// 				password,
-// 			});
-// 			if (error) throw error;
-// 			alert("Login successful!");
-// 		} catch (error) {
-// 			console.log("error");
-// 		} finally {
-// 			setIsLoading(false);
-// 		}
-// 	};
-
-// 	const handleSignUp = async () => {
-// 		try {
-// 			setIsLoading(true);
-// 			const { error } = await supabase.auth.signUp({
-// 				email,
-// 				password,
-// 			});
-// 			if (error) throw error;
-// 			alert("Sign up successful!");
-// 		} catch (error) {
-
-// 		} finally {
-// 			setIsLoading(false);
-// 		}
-// 	};
-
-// 	return (
-// 		<div>
-// 			<input
-// 				type="email"
-// 				placeholder="Email"
-// 				value={email}
-// 				onChange={(e) => setEmail(e.target.value)}
-// 			/>
-// 			<input
-// 				type="password"
-// 				placeholder="Password"
-// 				value={password}
-// 				onChange={(e) => setPassword(e.target.value)}
-// 			/>
-// 			<button onClick={handleLogin} disabled={isLoading}>
-// 				Login
-// 			</button>
-// 			<button onClick={handleSignUp} disabled={isLoading}>
-// 				Sign Up
-// 			</button>
-// 		</div>
-// 	);
-// };
-
-// export default Auth;

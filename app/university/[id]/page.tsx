@@ -5,17 +5,21 @@ import { cookies } from "next/headers";
 import { Database } from "@/types/supabase";
 
 
-export default async function UniversityDetailPage({
-	params,
-}: {
-	params: { id: string };
-}) {
-	const supabase = createServerComponentClient<Database>({ cookies });
+interface PageProps {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
 
-	const { data: school, error } = await supabase
-		.from("schools")
-		.select(
-			`
+export default async function UniversityDetailPage({ 
+  params,
+
+}: PageProps) {
+  const supabase = createServerComponentClient<Database>({ cookies });
+  
+  const { data: school, error } = await supabase
+    .from("schools")
+    .select(
+      `
       id,
       name,
       faculties (
@@ -35,31 +39,31 @@ export default async function UniversityDetailPage({
         )
       )
     `
-		)
-		.eq("id", params.id)
-		.single();
+    )
+    .eq("id", params.id)
+    .single();
 
-	if (error || !school) {
-		notFound();
-	}
+  if (error || !school) {
+    notFound();
+  }
 
-	return (
-		<div>
-			<h1 className="text-3xl font-bold mb-8">{school.name}</h1>
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-				{school.faculties?.map((faculty) => (
-					<div key={faculty.id} className="space-y-6">
-						<h2 className="text-2xl font-semibold">{faculty.name}</h2>
-						{faculty.departments?.map((department) => (
-							<UniversityDetailCard
-								key={department.id}
-								faculty={faculty}
-								department={department}
-							/>
-						))}
-					</div>
-				))}
-			</div>
-		</div>
-	);
+  return (
+    <div>
+      <h1 className="text-3xl font-bold mb-8">{school.name}</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {school.faculties?.map((faculty) => (
+          <div key={faculty.id} className="space-y-6">
+            <h2 className="text-2xl font-semibold">{faculty.name}</h2>
+            {faculty.departments?.map((department) => (
+              <UniversityDetailCard
+                key={department.id}
+                faculty={faculty}
+                department={department}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

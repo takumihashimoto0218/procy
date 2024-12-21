@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Session } from "@supabase/supabase-js";
 
+
 export default function RegisterPage() {
 	const router = useRouter();
 	const supabase = useMemo(() => createClientComponentClient<Database>(), []);
@@ -130,7 +131,7 @@ export default function RegisterPage() {
 					.order("name");
 
 				if (error) throw error;
-				setDepartments(data || []);
+				setDepartments(data);
 			} catch (error) {
 				console.error("Error fetching departments:", error);
 			}
