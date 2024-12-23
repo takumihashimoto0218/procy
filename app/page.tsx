@@ -1,5 +1,4 @@
 import { GraduationCap } from "lucide-react";
-import AuthServerButton from "@/auth/AuthServerButton";
 
 export default function Home() {
 	return (
@@ -11,9 +10,6 @@ export default function Home() {
 			<p className="text-xl text-muted-foreground mb-8 max-w-[600px]">
 				受験スケジュールを簡単に管理し、効率的な受験準備をサポートします。
 			</p>
-			<div className="flex gap-4">
-				<AuthServerButton />
-			</div>
 		</div>
 	);
 }
