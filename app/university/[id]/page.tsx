@@ -35,7 +35,8 @@ export default async function UniversityDetailPage({
           application_period_end,
           exam_date,
           result_date,
-          created_at
+          created_at,
+          url
         )
       )
     `

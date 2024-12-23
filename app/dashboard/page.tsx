@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { ApplicationStatus } from "@/types";
+import Link from 'next/link';
 
 interface UniversityWithStatus {
 	id: string;
@@ -13,11 +14,10 @@ interface UniversityWithStatus {
 	application_period_end: string | null;
 	exam_date: string | null;
 	result_date: string | null;
+	url: string;
 	status: ApplicationStatus;
 	userUniversityId: string;
 }
-
-
 
 interface SupabaseResponse {
 	id: string;
@@ -34,6 +34,7 @@ interface SupabaseResponse {
 		application_period_end: string | null;
 		exam_date: string | null;
 		result_date: string | null;
+		url: string;
 	};
 }
 
@@ -104,7 +105,8 @@ export default function DashboardPage() {
             application_period_start,
             application_period_end,
             exam_date,
-            result_date
+            result_date,
+						url
           )
         `
 				)
@@ -114,7 +116,6 @@ export default function DashboardPage() {
 			if (!data) return;
 
 			// データを型安全に変換
-			// データを型安全に変換する部分を修正
 			const formattedData: UniversityWithStatus[] = (
 				data as unknown as SupabaseResponse[]
 			).map((item) => ({
@@ -130,6 +131,7 @@ export default function DashboardPage() {
 				result_date: item.departments?.result_date ?? null,
 				status: item.status,
 				userUniversityId: item.id,
+				url: item.departments?.url,
 			}));
 
 			setUniversities(formattedData);
@@ -266,15 +268,10 @@ export default function DashboardPage() {
 				<div className="px-8 py-3">
 					<div className="flex justify-between items-center">
 						<div className="flex items-center space-x-2">
-							<div className="bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold">
-								AP
-							</div>
-							<span className="text-blue-500 font-medium">
-								AdmissionPlanner
-							</span>
+							<span className="text-blue-500 font-medium">Prop Sheet</span>
 						</div>
 						<div className="text-black text-sm">
-							Logged in as: {userName || "Loading..."}
+							{userName || "Loading..."}さん
 						</div>
 					</div>
 				</div>
@@ -313,6 +310,9 @@ export default function DashboardPage() {
 											<div className="text-sm text-black mt-1">
 												<div>{uni.facultyName}</div>
 												<div>{uni.departmentName}</div>
+												<Link href={uni.url} className="hover:underline">
+													{uni.url}
+												</Link>
 											</div>
 											<div className="mt-2">
 												<span

@@ -23,6 +23,7 @@ export interface Department {
   application_period_end: string | null;
   exam_date: string | null;
   result_date: string | null;
+  url: string;
 }
 
 export interface UserUniversity {

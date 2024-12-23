@@ -78,6 +78,7 @@ export interface Database {
           exam_date: string | null
           result_date: string | null
           created_at: string
+          url: string
         }
         Insert: {
           id?: string
@@ -88,6 +89,7 @@ export interface Database {
           exam_date?: string | null
           result_date?: string | null
           created_at?: string
+          url: string
         }
         Update: {
           id?: string
@@ -98,6 +100,7 @@ export interface Database {
           exam_date?: string | null
           result_date?: string | null
           created_at?: string
+          url: string
         }
       }
       user_universities: {

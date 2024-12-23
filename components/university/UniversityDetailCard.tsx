@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, FileText, Award } from "lucide-react";
 import { UniversityDetailCardProps } from "@/types/university";
+import Link from 'next/link';
 
 export function UniversityDetailCard({
 	faculty,
@@ -16,6 +17,9 @@ export function UniversityDetailCard({
 					<h3 className="font-semibold mb-2">学部・学科</h3>
 					<p>{faculty.name}</p>
 					<p className="text-muted-foreground">{department.name}</p>
+					<Link href={department.url} className="hover:underline">
+						{department.url}
+					</Link>
 				</div>
 				<div className="space-y-4">
 					<div className="flex items-center gap-3">
