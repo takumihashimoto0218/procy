@@ -280,7 +280,7 @@ export default function DashboardPage() {
 			<div className="px-8 py-4">
 				<div className="flex justify-between items-center mb-6">
 					<h1 className="text-xl font-medium text-black">
-						大学受験スケジュール管理
+						Prop Sheet
 					</h1>
 					<div className="w-[200px]"></div>
 				</div>
