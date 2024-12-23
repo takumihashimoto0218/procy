@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { ApplicationStatus } from "@/types";
 import Link from 'next/link';
@@ -37,11 +37,28 @@ interface SupabaseResponse {
     url: string;
   };
 }
+const getDates = () => {
+	const today = new Date();
+	const currentMonth = today.getMonth() + 1;
+	const year =
+		currentMonth >= 4 ? today.getFullYear() : today.getFullYear() - 1;
+	const startDate = new Date(year, 3, 1);
+
+	return Array.from({ length: 366 }, (_, index) => {
+		const date = new Date(startDate);
+		date.setDate(startDate.getDate() + index);
+		return date;
+	});
+};
+
+const dates = getDates();
 
 export default function DashboardPage() {
   const [universities, setUniversities] = useState<UniversityWithStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState("");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const getStatusBadge = (status: ApplicationStatus) => {
     const statusConfig = {
@@ -60,6 +77,31 @@ export default function DashboardPage() {
     fetchUserData();
     fetchUniversityData();
   }, []);
+
+  useEffect(() => {
+    if (!isLoading && scrollContainerRef.current && gridRef.current) {
+      const container = scrollContainerRef.current;
+      const grid = gridRef.current;
+      const today = new Date();
+      
+      // 現在の日付のインデックスを見つける
+      const todayIndex = dates.findIndex(date => 
+        date.getDate() === today.getDate() &&
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear()
+      );
+
+      if (todayIndex !== -1) {
+        const cellWidth = grid.scrollWidth / dates.length;
+        const containerWidth = container.clientWidth;
+        
+        // スクロール位置を計算（今日の日付を中央に配置）
+        const scrollPosition = (cellWidth * todayIndex) - (containerWidth / 2) + (cellWidth / 2);
+        
+        container.scrollLeft = Math.max(0, scrollPosition);
+      }
+    }
+  }, [isLoading, dates]);
 
   const fetchUserData = async () => {
     try {
@@ -248,21 +290,7 @@ export default function DashboardPage() {
     return "";
   };
 
-  const getDates = () => {
-    const today = new Date();
-    const currentMonth = today.getMonth() + 1;
-    const year =
-      currentMonth >= 4 ? today.getFullYear() : today.getFullYear() - 1;
-    const startDate = new Date(year, 3, 1);
 
-    return Array.from({ length: 366 }, (_, index) => {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + index);
-      return date;
-    });
-  };
-
-  const dates = getDates();
 
   if (isLoading) {
     return (
@@ -340,13 +368,14 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="flex-1 border border-gray-200 rounded bg-white p-6 overflow-x-auto">
+          <div className="flex-1 border border-gray-200 rounded bg-white p-6 overflow-x-auto" ref={scrollContainerRef}>
             <div className="min-w-[1200px]">
               <div
                 className="grid"
                 style={{
                   gridTemplateColumns: `repeat(${dates.length}, minmax(40px, 1fr))`,
                 }}
+                ref={gridRef}
               >
                 {dates.map((date, index) => {
                   const today = new Date();
