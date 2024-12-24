@@ -3,39 +3,39 @@
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { ApplicationStatus } from "@/types";
-import Link from 'next/link';
+import Link from "next/link";
 
 interface UniversityWithStatus {
-  id: string;
-  schoolName: string;
-  facultyName: string;
-  departmentName: string;
-  application_period_start: string | null;
-  application_period_end: string | null;
-  exam_date: string | null;
-  result_date: string | null;
-  url: string;
-  status: ApplicationStatus;
-  userUniversityId: string;
+	id: string;
+	schoolName: string;
+	facultyName: string;
+	departmentName: string;
+	application_period_start: string | null;
+	application_period_end: string | null;
+	exam_date: string | null;
+	result_date: string | null;
+	url: string;
+	status: ApplicationStatus;
+	userUniversityId: string;
 }
 
 interface SupabaseResponse {
-  id: string;
-  status: ApplicationStatus;
-  schools: {
-    name: string;
-  };
-  faculties: {
-    name: string;
-  };
-  departments: {
-    name: string;
-    application_period_start: string | null;
-    application_period_end: string | null;
-    exam_date: string | null;
-    result_date: string | null;
-    url: string;
-  };
+	id: string;
+	status: ApplicationStatus;
+	schools: {
+		name: string;
+	};
+	faculties: {
+		name: string;
+	};
+	departments: {
+		name: string;
+		application_period_start: string | null;
+		application_period_end: string | null;
+		exam_date: string | null;
+		result_date: string | null;
+		url: string;
+	};
 }
 const getDates = () => {
 	const today = new Date();
@@ -54,86 +54,88 @@ const getDates = () => {
 const dates = getDates();
 
 export default function DashboardPage() {
-  const [universities, setUniversities] = useState<UniversityWithStatus[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userName, setUserName] = useState("");
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+	const [universities, setUniversities] = useState<UniversityWithStatus[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [userName, setUserName] = useState("");
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const gridRef = useRef<HTMLDivElement>(null);
 
-  const getStatusBadge = (status: ApplicationStatus) => {
-    const statusConfig = {
-      considering: { label: "検討中", className: "bg-gray-100 text-gray-800" },
-      applied: {
-        label: "出願済み",
-        className: "bg-yellow-100 text-yellow-800",
-      },
-      scheduled: { label: "試験予定", className: "bg-blue-100 text-blue-800" },
-      completed: { label: "完了", className: "bg-green-100 text-green-800" },
-    };
-    return statusConfig[status];
-  };
+	const getStatusBadge = (status: ApplicationStatus) => {
+		const statusConfig = {
+			considering: { label: "検討中", className: "bg-gray-100 text-gray-800" },
+			applied: {
+				label: "出願済み",
+				className: "bg-yellow-100 text-yellow-800",
+			},
+			scheduled: { label: "試験予定", className: "bg-blue-100 text-blue-800" },
+			completed: { label: "完了", className: "bg-green-100 text-green-800" },
+		};
+		return statusConfig[status];
+	};
 
-  useEffect(() => {
-    fetchUserData();
-    fetchUniversityData();
-  }, []);
+	useEffect(() => {
+		fetchUserData();
+		fetchUniversityData();
+	}, []);
 
-  useEffect(() => {
-    if (!isLoading && scrollContainerRef.current && gridRef.current) {
-      const container = scrollContainerRef.current;
-      const grid = gridRef.current;
-      const today = new Date();
-      
-      // 現在の日付のインデックスを見つける
-      const todayIndex = dates.findIndex(date => 
-        date.getDate() === today.getDate() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear()
-      );
+	useEffect(() => {
+		if (!isLoading && scrollContainerRef.current && gridRef.current) {
+			const container = scrollContainerRef.current;
+			const grid = gridRef.current;
+			const today = new Date();
 
-      if (todayIndex !== -1) {
-        const cellWidth = grid.scrollWidth / dates.length;
-        const containerWidth = container.clientWidth;
-        
-        // スクロール位置を計算（今日の日付を中央に配置）
-        const scrollPosition = (cellWidth * todayIndex) - (containerWidth / 2) + (cellWidth / 2);
-        
-        container.scrollLeft = Math.max(0, scrollPosition);
-      }
-    }
-  }, [isLoading, dates]);
+			// 現在の日付のインデックスを見つける
+			const todayIndex = dates.findIndex(
+				(date) =>
+					date.getDate() === today.getDate() &&
+					date.getMonth() === today.getMonth() &&
+					date.getFullYear() === today.getFullYear()
+			);
 
-  const fetchUserData = async () => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
+			if (todayIndex !== -1) {
+				const cellWidth = grid.scrollWidth / dates.length;
+				const containerWidth = container.clientWidth;
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("name")
-        .eq("id", user.id)
-        .single();
+				// スクロール位置を計算（今日の日付を中央に配置）
+				const scrollPosition =
+					cellWidth * todayIndex - containerWidth / 2 + cellWidth / 2;
 
-      if (error) throw error;
-      if (data) setUserName(data.name);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
+				container.scrollLeft = Math.max(0, scrollPosition);
+			}
+		}
+	}, [isLoading, dates]);
 
-  const fetchUniversityData = async () => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
+	const fetchUserData = async () => {
+		try {
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
+			if (!user) throw new Error("User not authenticated");
 
-      const { data, error } = await supabase
-        .from("user_universities")
-        .select(
-          `
+			const { data, error } = await supabase
+				.from("profiles")
+				.select("name")
+				.eq("id", user.id)
+				.single();
+
+			if (error) throw error;
+			if (data) setUserName(data.name);
+		} catch (error) {
+			console.error("Error fetching user data:", error);
+		}
+	};
+
+	const fetchUniversityData = async () => {
+		try {
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
+			if (!user) throw new Error("User not authenticated");
+
+			const { data, error } = await supabase
+				.from("user_universities")
+				.select(
+					`
           id,
           status,
           schools:school_id (
@@ -151,288 +153,289 @@ export default function DashboardPage() {
             url
           )
         `
-        )
-        .eq("user_id", user.id);
+				)
+				.eq("user_id", user.id);
 
-      if (error) throw error;
-      if (!data) return;
+			if (error) throw error;
+			if (!data) return;
 
-      const formattedData: UniversityWithStatus[] = (
-        data as unknown as SupabaseResponse[]
-      ).map((item) => ({
-        id: item.id,
-        schoolName: item.schools?.name ?? "No school name",
-        facultyName: item.faculties?.name ?? "No faculty name",
-        departmentName: item.departments?.name ?? "No department name",
-        application_period_start:
-          item.departments?.application_period_start ?? null,
-        application_period_end:
-          item.departments?.application_period_end ?? null,
-        exam_date: item.departments?.exam_date ?? null,
-        result_date: item.departments?.result_date ?? null,
-        status: item.status,
-        userUniversityId: item.id,
-        url: item.departments?.url,
-      }));
+			const formattedData: UniversityWithStatus[] = (
+				data as unknown as SupabaseResponse[]
+			).map((item) => ({
+				id: item.id,
+				schoolName: item.schools?.name ?? "No school name",
+				facultyName: item.faculties?.name ?? "No faculty name",
+				departmentName: item.departments?.name ?? "No department name",
+				application_period_start:
+					item.departments?.application_period_start ?? null,
+				application_period_end:
+					item.departments?.application_period_end ?? null,
+				exam_date: item.departments?.exam_date ?? null,
+				result_date: item.departments?.result_date ?? null,
+				status: item.status,
+				userUniversityId: item.id,
+				url: item.departments?.url,
+			}));
 
-      setUniversities(formattedData);
-    } catch (error) {
-      console.error("Error fetching universities:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+			setUniversities(formattedData);
+		} catch (error) {
+			console.error("Error fetching universities:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
-  const handleDelete = async (userUniversityId: string) => {
-    try {
-      const { error } = await supabase
-        .from("user_universities")
-        .delete()
-        .eq("id", userUniversityId);
+	const handleDelete = async (userUniversityId: string) => {
+		try {
+			const { error } = await supabase
+				.from("user_universities")
+				.delete()
+				.eq("id", userUniversityId);
 
-      if (error) throw error;
+			if (error) throw error;
 
-      setUniversities((prev) =>
-        prev.filter((uni) => uni.userUniversityId !== userUniversityId)
-      );
-    } catch (error) {
-      console.error("Error deleting university:", error);
-    }
-  };
+			setUniversities((prev) =>
+				prev.filter((uni) => uni.userUniversityId !== userUniversityId)
+			);
+		} catch (error) {
+			console.error("Error deleting university:", error);
+		}
+	};
 
-  const adjustToAcademicYear = (
-    dateStr: string | null,
-    currentYear: number
-  ): string | null => {
-    if (!dateStr) return null;
+	const adjustToAcademicYear = (
+		dateStr: string | null,
+		currentYear: number
+	): string | null => {
+		if (!dateStr) return null;
 
-    try {
-      let month: string;
-      let day: string;
+		try {
+			let month: string;
+			let day: string;
 
-      if (dateStr.includes("/")) {
-        [month, day] = dateStr.split("/");
-      } else if (dateStr.includes("-")) {
-        [month, day] = dateStr.split("-");
-      } else {
-        return null;
-      }
+			if (dateStr.includes("/")) {
+				[month, day] = dateStr.split("/");
+			} else if (dateStr.includes("-")) {
+				[month, day] = dateStr.split("-");
+			} else {
+				return null;
+			}
 
-      const monthNum = parseInt(month);
-      if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) return null;
+			const monthNum = parseInt(month);
+			if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) return null;
 
-      const academicYear =
-        new Date().getMonth() + 1 >= 4 ? currentYear : currentYear - 1;
-      const year =
-        monthNum >= 1 && monthNum <= 3 ? academicYear + 1 : academicYear;
-      const paddedMonth = month.toString().padStart(2, "0");
-      const paddedDay = day.toString().padStart(2, "0");
+			const academicYear =
+				new Date().getMonth() + 1 >= 4 ? currentYear : currentYear - 1;
+			const year =
+				monthNum >= 1 && monthNum <= 3 ? academicYear + 1 : academicYear;
+			const paddedMonth = month.toString().padStart(2, "0");
+			const paddedDay = day.toString().padStart(2, "0");
 
-      return `${year}-${paddedMonth}-${paddedDay}`;
-    } catch (error) {
-      console.error("Error parsing date:", dateStr, error);
-      return null;
-    }
-  };
+			return `${year}-${paddedMonth}-${paddedDay}`;
+		} catch (error) {
+			console.error("Error parsing date:", dateStr, error);
+			return null;
+		}
+	};
 
-  const getCellBackground = (uni: UniversityWithStatus, date: Date): string => {
-    // 今日の日付を取得
-    const today = new Date();
-    const isToday = 
-      date.getDate() === today.getDate() && 
-      date.getMonth() === today.getMonth() && 
-      date.getFullYear() === today.getFullYear();
+	const getCellBackground = (uni: UniversityWithStatus, date: Date): string => {
+		// 今日の日付を取得
+		const today = new Date();
+		const isToday =
+			date.getDate() === today.getDate() &&
+			date.getMonth() === today.getMonth() &&
+			date.getFullYear() === today.getFullYear();
 
-    if (isToday) {
-      return "bg-orange-100"; // 今日の日付の背景色
-    }
+		if (isToday) {
+			return "bg-orange-100"; // 今日の日付の背景色
+		}
 
-    if (
-      !uni.application_period_start ||
-      !uni.application_period_end ||
-      !uni.exam_date ||
-      !uni.result_date
-    ) {
-      return "";
-    }
+		if (
+			!uni.application_period_start ||
+			!uni.application_period_end ||
+			!uni.exam_date ||
+			!uni.result_date
+		) {
+			return "";
+		}
 
-    try {
-      const currentYear = new Date().getFullYear();
-      const currentDateStr = date.toISOString().split("T")[0];
+		try {
+			const currentYear = new Date().getFullYear();
+			const currentDateStr = date.toISOString().split("T")[0];
 
-      const examDateStr = adjustToAcademicYear(uni.exam_date, currentYear);
-      const resultDateStr = adjustToAcademicYear(uni.result_date, currentYear);
-      const startDateStr = adjustToAcademicYear(
-        uni.application_period_start,
-        currentYear
-      );
-      const endDateStr = adjustToAcademicYear(
-        uni.application_period_end,
-        currentYear
-      );
+			const examDateStr = adjustToAcademicYear(uni.exam_date, currentYear);
+			const resultDateStr = adjustToAcademicYear(uni.result_date, currentYear);
+			const startDateStr = adjustToAcademicYear(
+				uni.application_period_start,
+				currentYear
+			);
+			const endDateStr = adjustToAcademicYear(
+				uni.application_period_end,
+				currentYear
+			);
 
-      if (!examDateStr || !resultDateStr || !startDateStr || !endDateStr) {
-        return "";
-      }
+			if (!examDateStr || !resultDateStr || !startDateStr || !endDateStr) {
+				return "";
+			}
 
-      if (currentDateStr === examDateStr) {
-        return "bg-red-200";
-      }
-      if (currentDateStr === resultDateStr) {
-        return "bg-green-200";
-      }
-      if (currentDateStr >= startDateStr && currentDateStr <= endDateStr) {
-        return "bg-blue-200";
-      }
-    } catch (error) {
-      console.error("Date parsing error:", error);
-    }
-    return "";
-  };
+			if (currentDateStr === examDateStr) {
+				return "bg-red-200";
+			}
+			if (currentDateStr === resultDateStr) {
+				return "bg-green-200";
+			}
+			if (currentDateStr >= startDateStr && currentDateStr <= endDateStr) {
+				return "bg-blue-200";
+			}
+		} catch (error) {
+			console.error("Date parsing error:", error);
+		}
+		return "";
+	};
 
+	if (isLoading) {
+		return (
+			<div className="min-h-screen flex items-center justify-center">
+				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+			</div>
+		);
+	}
 
+	return (
+		<div className="min-h-screen bg-white">
+			<header className="border-b border-gray-200 bg-white">
+				<div className="px-8 py-3">
+					<div className="flex justify-between items-center">
+						<div className="flex items-center space-x-2">
+							<span className="text-blue-500 font-medium">PROPSHEET</span>
+						</div>
+						<div className="text-black text-sm">
+							{userName || "Loading..."}さん
+						</div>
+					</div>
+				</div>
+			</header>
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
+			<div className="px-8 py-4">
+				<div className="flex justify-between items-center mb-6">
+					<h1 className="text-xl font-medium text-black">PROPSHEET</h1>
+					<div className="w-[200px]"></div>
+				</div>
 
-  return (
-    <div className="min-h-screen bg-white">
-      <header className="border-b border-gray-200 bg-white">
-        <div className="px-8 py-3">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <span className="text-blue-500 font-medium">Prop Sheet</span>
-            </div>
-            <div className="text-black text-sm">
-              {userName || "Loading..."}さん
-            </div>
-          </div>
-        </div>
-      </header>
+				<div className="flex gap-6">
+					<div className="w-[350px] bg-white rounded border border-gray-200 p-4">
+						<h2 className="font-medium text-sm mb-4 text-black">
+							大学 / 受験方式
+						</h2>
+						<div className="space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto">
+							{universities.map((uni) => (
+								<div key={uni.userUniversityId} className="group">
+									<div className="flex items-start gap-2">
+										<span className="text-black">≡</span>
+										<div className="flex-grow">
+											<div className="flex items-center justify-between">
+												<span className="font-medium text-black">
+													{uni.schoolName}
+												</span>
+												<button
+													className="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+													onClick={() => handleDelete(uni.userUniversityId)}
+												>
+													ⓧ
+												</button>
+											</div>
+											<div className="text-sm text-black mt-1">
+												<div>{uni.facultyName}</div>
+												<div>{uni.departmentName}</div>
+												<Link href={uni.url} className="hover:underline">
+													{uni.url}
+												</Link>
+											</div>
+											<div className="mt-2">
+												<span
+													className={`inline-block px-2 py-0.5 rounded text-xs ${
+														getStatusBadge(uni.status).className
+													}`}
+												>
+													{getStatusBadge(uni.status).label}
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							))}
+						</div>
+					</div>
 
-      <div className="px-8 py-4">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-medium text-black">
-            Prop Sheet
-          </h1>
-          <div className="w-[200px]"></div>
-        </div>
+					<div
+						className="flex-1 border border-gray-200 rounded bg-white p-6 overflow-x-auto"
+						ref={scrollContainerRef}
+					>
+						<div className="min-w-[1200px]">
+							<div
+								className="grid"
+								style={{
+									gridTemplateColumns: `repeat(${dates.length}, minmax(40px, 1fr))`,
+								}}
+								ref={gridRef}
+							>
+								{dates.map((date, index) => {
+									const today = new Date();
+									const isToday =
+										date.getDate() === today.getDate() &&
+										date.getMonth() === today.getMonth() &&
+										date.getFullYear() === today.getFullYear();
 
-        <div className="flex gap-6">
-          <div className="w-[350px] bg-white rounded border border-gray-200 p-4">
-            <h2 className="font-medium text-sm mb-4 text-black">
-              大学 / 受験方式
-            </h2>
-            <div className="space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto">
-              {universities.map((uni) => (
-                <div key={uni.userUniversityId} className="group">
-                  <div className="flex items-start gap-2">
-                    <span className="text-black">≡</span>
-                    <div className="flex-grow">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-black">
-                          {uni.schoolName}
-                        </span>
-                        <button
-                          className="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => handleDelete(uni.userUniversityId)}
-                        >
-                          ⓧ
-                        </button>
-                      </div>
-                      <div className="text-sm text-black mt-1">
-                        <div>{uni.facultyName}</div>
-                        <div>{uni.departmentName}</div>
-                        <Link href={uni.url} className="hover:underline">
-                          {uni.url}
-                        </Link>
-                      </div>
-                      <div className="mt-2">
-                        <span
-                          className={`inline-block px-2 py-0.5 rounded text-xs ${
-                            getStatusBadge(uni.status).className
-                          }`}
-                        >
-                          {getStatusBadge(uni.status).label}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+									return (
+										<div
+											key={`header-${
+												date.toISOString().split("T")[0]
+											}-${index}`}
+											className={`text-center text-sm text-black py-2 px-1 border-b border-r border-gray-200 ${
+												isToday ? "bg-orange-100 font-medium" : ""
+											}`}
+										>
+											{`${date.getMonth() + 1}/${date.getDate()}`}
+										</div>
+									);
+								})}
 
-          <div className="flex-1 border border-gray-200 rounded bg-white p-6 overflow-x-auto" ref={scrollContainerRef}>
-            <div className="min-w-[1200px]">
-              <div
-                className="grid"
-                style={{
-                  gridTemplateColumns: `repeat(${dates.length}, minmax(40px, 1fr))`,
-                }}
-                ref={gridRef}
-              >
-                {dates.map((date, index) => {
-                  const today = new Date();
-                  const isToday = 
-                    date.getDate() === today.getDate() && 
-                    date.getMonth() === today.getMonth() && 
-                    date.getFullYear() === today.getFullYear();
+								{universities.map((uni) =>
+									dates.map((date, dateIndex) => (
+										<div
+											key={`cell-${uni.userUniversityId}-${
+												date.toISOString().split("T")[0]
+											}-${dateIndex}`}
+											className={`h-24 border-b border-r border-gray-100 ${getCellBackground(
+												uni,
+												date
+											)}`}
+										/>
+									))
+								)}
+							</div>
+						</div>
+					</div>
+				</div>
 
-                  return (
-                    <div
-                      key={`header-${date.toISOString().split("T")[0]}-${index}`}
-                      className={`text-center text-sm text-black py-2 px-1 border-b border-r border-gray-200 ${
-                        isToday ? "bg-orange-100 font-medium" : ""
-                      }`}
-                    >
-                      {`${date.getMonth() + 1}/${date.getDate()}`}
-                    </div>
-                  );
-                })}
-
-                {universities.map((uni) =>
-                  dates.map((date, dateIndex) => (
-                    <div
-                      key={`cell-${uni.userUniversityId}-${
-                        date.toISOString().split("T")[0]
-                      }-${dateIndex}`}
-                      className={`h-24 border-b border-r border-gray-100 ${getCellBackground(
-                        uni,
-                        date
-                      )}`}
-                    />
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 flex justify-center space-x-6">
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-blue-200 rounded mr-2"></div>
-            <span className="text-sm text-black">出願期間</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-red-200 rounded mr-2"></div>
-            <span className="text-sm text-black">試験日</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-green-200 rounded mr-2"></div>
-            <span className="text-sm text-black">合格発表日</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-orange-100 rounded mr-2"></div>
-            <span className="text-sm text-black">今日</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+				<div className="mt-6 flex justify-center space-x-6">
+					<div className="flex items-center">
+						<div className="w-4 h-4 bg-blue-200 rounded mr-2"></div>
+						<span className="text-sm text-black">出願期間</span>
+					</div>
+					<div className="flex items-center">
+						<div className="w-4 h-4 bg-red-200 rounded mr-2"></div>
+						<span className="text-sm text-black">試験日</span>
+					</div>
+					<div className="flex items-center">
+						<div className="w-4 h-4 bg-green-200 rounded mr-2"></div>
+						<span className="text-sm text-black">合格発表日</span>
+					</div>
+					<div className="flex items-center">
+						<div className="w-4 h-4 bg-orange-100 rounded mr-2"></div>
+						<span className="text-sm text-black">今日</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }
