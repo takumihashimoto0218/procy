@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { ApplicationStatus } from "@/types";
 import Link from "next/link";
+import { Users, Calendar, ChevronRight, X, Building } from "lucide-react";
 
 interface UniversityWithStatus {
 	id: string;
@@ -37,6 +38,7 @@ interface SupabaseResponse {
 		url: string;
 	};
 }
+
 const getDates = () => {
 	const today = new Date();
 	const currentMonth = today.getMonth() + 1;
@@ -84,7 +86,6 @@ export default function DashboardPage() {
 			const grid = gridRef.current;
 			const today = new Date();
 
-			// 現在の日付のインデックスを見つける
 			const todayIndex = dates.findIndex(
 				(date) =>
 					date.getDate() === today.getDate() &&
@@ -95,11 +96,8 @@ export default function DashboardPage() {
 			if (todayIndex !== -1) {
 				const cellWidth = grid.scrollWidth / dates.length;
 				const containerWidth = container.clientWidth;
-
-				// スクロール位置を計算（今日の日付を中央に配置）
 				const scrollPosition =
 					cellWidth * todayIndex - containerWidth / 2 + cellWidth / 2;
-
 				container.scrollLeft = Math.max(0, scrollPosition);
 			}
 		}
@@ -238,7 +236,6 @@ export default function DashboardPage() {
 	};
 
 	const getCellBackground = (uni: UniversityWithStatus, date: Date): string => {
-		// 今日の日付を取得
 		const today = new Date();
 		const isToday =
 			date.getDate() === today.getDate() &&
@@ -246,7 +243,7 @@ export default function DashboardPage() {
 			date.getFullYear() === today.getFullYear();
 
 		if (isToday) {
-			return "bg-orange-100"; // 今日の日付の背景色
+			return "bg-orange-100";
 		}
 
 		if (
@@ -294,146 +291,170 @@ export default function DashboardPage() {
 
 	if (isLoading) {
 		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+			<div className="min-h-screen flex items-center justify-center bg-gray-50">
+				<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="min-h-screen bg-white">
-			<header className="border-b border-gray-200 bg-white">
-				<div className="px-8 py-3">
-					<div className="flex justify-between items-center">
-						<div className="flex items-center space-x-2">
-							<span className="text-blue-500 font-medium">PROPSHEET</span>
-						</div>
-						<div className="text-black text-sm">
-							{userName || "Loading..."}さん
+		<div className="min-h-screen bg-gray-50">
+			{/* ヘッダー */}
+			<header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="flex justify-end items-center h-16">
+						<div className="flex items-center space-x-4">
+							<div className="flex items-center space-x-2">
+								<div className="bg-blue-100 p-2 rounded-full">
+									<Users className="h-5 w-5 text-blue-600" />
+								</div>
+								<span className="flex-end text-sm font-medium text-gray-700">
+									{userName || "Loading..."}さん
+								</span>
+							</div>
 						</div>
 					</div>
 				</div>
 			</header>
 
 			<div className="px-8 py-4">
-				<div className="flex justify-between items-center mb-6">
-					<h1 className="text-xl font-medium text-black">PROPSHEET</h1>
-					<div className="w-[200px]"></div>
-				</div>
-
 				<div className="flex gap-6">
-					<div className="w-[350px] bg-white rounded border border-gray-200 p-4">
-						<h2 className="font-medium text-sm mb-4 text-black">
-							大学 / 受験方式
-						</h2>
-						<div className="space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto">
-							{universities.map((uni) => (
-								<div key={uni.userUniversityId} className="group">
-									<div className="flex items-start gap-2">
-										<span className="text-black">≡</span>
-										<div className="flex-grow">
-											<div className="flex items-center justify-between">
-												<span className="font-medium text-black">
-													{uni.schoolName}
-												</span>
-												<button
-													className="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-													onClick={() => handleDelete(uni.userUniversityId)}
-												>
-													ⓧ
-												</button>
-											</div>
-											<div className="text-sm text-black mt-1">
-												<div>{uni.facultyName}</div>
-												<div>{uni.departmentName}</div>
-												<Link href={uni.url} className="hover:underline">
-													{uni.url}
-												</Link>
-											</div>
-											<div className="mt-2">
-												<span
-													className={`inline-block px-2 py-0.5 rounded text-xs ${
-														getStatusBadge(uni.status).className
-													}`}
-												>
-													{getStatusBadge(uni.status).label}
-												</span>
+					{/* サイドバー */}
+					<div className="w-[350px] bg-white rounded-2xl border border-gray-200 shadow-sm">
+						<div className="p-6">
+							<div className="flex items-center justify-between mb-6">
+								<h2 className="text-lg font-semibold text-gray-900 flex items-center">
+									<Building className="w-5 h-5 mr-2 text-blue-600" />
+									受験予定校
+								</h2>
+							</div>
+							<div className="space-y-4 max-h-[calc(100vh-280px)] overflow-y-auto">
+								{universities.map((uni) => (
+									<div
+										key={uni.userUniversityId}
+										className="group bg-white rounded-xl hover:bg-gray-50 transition-colors duration-200 p-4"
+									>
+										<div className="flex items-start gap-3">
+											<div className="flex-grow">
+												<div className="flex items-start justify-between">
+													<div>
+														<h3 className="font-medium text-gray-900">
+															{uni.schoolName}
+														</h3>
+														<div className="mt-1 space-y-1">
+															<p className="text-sm text-gray-600">
+																{uni.facultyName}
+															</p>
+															<p className="text-sm text-gray-600">
+																{uni.departmentName}
+															</p>
+															<Link
+																href={uni.url}
+																className="text-sm text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1 mt-1"
+															>
+																<span>公式サイト</span>
+																<ChevronRight className="w-4 h-4" />
+															</Link>
+														</div>
+													</div>
+													<button
+														onClick={() => handleDelete(uni.userUniversityId)}
+														className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+													>
+														<X className="w-5 h-5" />
+													</button>
+												</div>
+												<div className="mt-3">
+													<span
+														className={`
+                            inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
+                            ${getStatusBadge(uni.status).className}
+                          `}
+													>
+														{getStatusBadge(uni.status).label}
+													</span>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-							))}
+								))}
+							</div>
 						</div>
 					</div>
 
+					{/* ガントチャート */}
 					<div
-						className="flex-1 border border-gray-200 rounded bg-white p-6 overflow-x-auto"
+						className="flex-1 border border-gray-200 rounded-2xl bg-white shadow-sm overflow-x-auto"
 						ref={scrollContainerRef}
 					>
-						<div className="min-w-[1200px]">
-							<div
-								className="grid"
-								style={{
-									gridTemplateColumns: `repeat(${dates.length}, minmax(40px, 1fr))`,
-								}}
-								ref={gridRef}
-							>
-								{dates.map((date, index) => {
-									const today = new Date();
-									const isToday =
-										date.getDate() === today.getDate() &&
-										date.getMonth() === today.getMonth() &&
-										date.getFullYear() === today.getFullYear();
+						<div className="p-6">
+							<div className="flex items-center justify-between mb-6">
+								<h2 className="text-lg font-semibold text-gray-900 flex items-center">
+									<Calendar className="w-5 h-5 mr-2 text-blue-600" />
+									スケジュール
+								</h2>
+							</div>
+							<div className="min-w-[1200px]">
+								<div
+									className="grid"
+									style={{
+										gridTemplateColumns: `repeat(${dates.length}, minmax(40px, 1fr))`,
+									}}
+									ref={gridRef}
+								>
+									{dates.map((date, index) => {
+										const today = new Date();
+										const isToday =
+											date.getDate() === today.getDate() &&
+											date.getMonth() === today.getMonth() &&
+											date.getFullYear() === today.getFullYear();
 
-									return (
-										<div
-											key={`header-${
-												date.toISOString().split("T")[0]
-											}-${index}`}
-											className={`text-center text-sm text-black py-2 px-1 border-b border-r border-gray-200 ${
-												isToday ? "bg-orange-100 font-medium" : ""
-											}`}
-										>
-											{`${date.getMonth() + 1}/${date.getDate()}`}
-										</div>
-									);
-								})}
+										return (
+											<div
+												key={`header-${
+													date.toISOString().split("T")[0]
+												}-${index}`}
+												className={`text-center text-sm text-gray-600 py-2 px-1 border-b border-r border-gray-200 ${
+													isToday ? "bg-orange-100 font-medium" : ""
+												}`}
+											>
+												{`${date.getMonth() + 1}/${date.getDate()}`}
+											</div>
+										);
+									})}
 
-								{universities.map((uni) =>
-									dates.map((date, dateIndex) => (
-										<div
-											key={`cell-${uni.userUniversityId}-${
-												date.toISOString().split("T")[0]
-											}-${dateIndex}`}
-											className={`h-24 border-b border-r border-gray-100 ${getCellBackground(
-												uni,
-												date
-											)}`}
-										/>
-									))
-								)}
+									{universities.map((uni) =>
+										dates.map((date, dateIndex) => (
+											<div
+												key={`cell-${uni.userUniversityId}-${
+													date.toISOString().split("T")[0]
+												}-${dateIndex}`}
+												className={`h-24 border-b border-r border-gray-100 ${getCellBackground(
+													uni,
+													date
+												)}`}
+											/>
+										))
+									)}
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<div className="mt-6 flex justify-center space-x-6">
-					<div className="flex items-center">
-						<div className="w-4 h-4 bg-blue-200 rounded mr-2"></div>
-						<span className="text-sm text-black">出願期間</span>
-					</div>
-					<div className="flex items-center">
-						<div className="w-4 h-4 bg-red-200 rounded mr-2"></div>
-						<span className="text-sm text-black">試験日</span>
-					</div>
-					<div className="flex items-center">
-						<div className="w-4 h-4 bg-green-200 rounded mr-2"></div>
-						<span className="text-sm text-black">合格発表日</span>
-					</div>
-					<div className="flex items-center">
-						<div className="w-4 h-4 bg-orange-100 rounded mr-2"></div>
-						<span className="text-sm text-black">今日</span>
-					</div>
+				{/* 凡例 */}
+				<div className="mt-6 flex justify-center space-x-8">
+					{[
+						{ color: "bg-blue-200", label: "出願期間" },
+						{ color: "bg-red-200", label: "試験日" },
+						{ color: "bg-green-200", label: "合格発表日" },
+						{ color: "bg-orange-100", label: "今日" },
+					].map((item, index) => (
+						<div key={index} className="flex items-center space-x-2">
+							<div className={`w-4 h-4 ${item.color} rounded-full`}></div>
+							<span className="text-sm text-gray-600">{item.label}</span>
+						</div>
+					))}
 				</div>
 			</div>
 		</div>
